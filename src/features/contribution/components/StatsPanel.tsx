@@ -81,7 +81,7 @@ export function StatsPanel({
             { label: t('contribution.sidebar.recorded'), value: userStats.recordings, icon: Mic, color: 'text-teal-500' },
             { label: t('contribution.sidebar.corrected'), value: userStats.corrections, icon: Edit3, color: 'text-amber-500' },
             { label: t('contribution.sidebar.streak'), value: streak, icon: Flame, color: 'text-orange-500', sub: `${t('contribution.sidebar.best')}: ${personalBestStreak}` },
-            { label: 'Total XP', value: totalXP.toLocaleString(), icon: Trophy, color: 'text-primary', sub: `${totalWords} ${t('contribution.impact.wordsPreserved')}` },
+            { label: t('contribution.stats.totalXP'), value: totalXP.toLocaleString(), icon: Trophy, color: 'text-primary', sub: `${totalWords} ${t('contribution.impact.wordsPreserved')}` },
           ].map((stat, i) => (
             <div key={stat.label} className="bg-background p-8 sm:p-12">
               <stat.icon className={cn("h-8 w-8 mb-6", stat.color)} />
@@ -199,7 +199,7 @@ export function StatsPanel({
           <div className="bg-background p-8 sm:p-12 lg:p-16 border-t border-border lg:border-t-0">
             <h3 className="text-xs font-black uppercase tracking-[0.2em] text-primary mb-10 flex items-center gap-2">
               <Medal className="h-4 w-4" />
-              Top Contributors
+              {t('contribution.stats.topContributors')}
             </h3>
             <div className="space-y-6">
               {leaders.slice(0, 5).map((leader, index) => (
@@ -215,7 +215,7 @@ export function StatsPanel({
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-bold truncate group-hover:text-primary transition-colors">{leader.displayName}</p>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">{leader.xpTotal.toLocaleString()} XP</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">{leader.xpTotal.toLocaleString()} {t('contribution.stats.xp')}</p>
                   </div>
                 </div>
               ))}

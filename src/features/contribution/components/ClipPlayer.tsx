@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { Play, Pause, Volume2, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ClipPlayerProps {
   audioUrl: string;
@@ -8,6 +9,7 @@ interface ClipPlayerProps {
 }
 
 export function ClipPlayer({ audioUrl, duration: propDuration, onError }: ClipPlayerProps) {
+  const { t } = useTranslation();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(propDuration || 0);
@@ -20,7 +22,7 @@ export function ClipPlayer({ audioUrl, duration: propDuration, onError }: ClipPl
         audioRef.current.pause();
       } else {
         audioRef.current.play().catch(() => {
-          setError('Failed to play audio');
+          setError(t('contribution.chat.playError'));
           onError?.();
         });
       }
@@ -45,7 +47,7 @@ export function ClipPlayer({ audioUrl, duration: propDuration, onError }: ClipPl
   };
 
   const handleError = () => {
-    setError('Failed to load audio');
+    setError(t('contribution.chat.audioError'));
     onError?.();
   };
 
@@ -77,11 +79,11 @@ export function ClipPlayer({ audioUrl, duration: propDuration, onError }: ClipPl
           <span>{error}</span>
         </div>
       ) : (
-        <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+        <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-none">
           <button
             type="button"
             onClick={handlePlay}
-            className="h-10 w-10 flex items-center justify-center rounded-full bg-primary text-primary-foreground hover:opacity-90 transition-opacity flex-shrink-0"
+            className="h-10 w-10 flex items-center justify-center rounded-none bg-primary text-primary-foreground hover:opacity-90 transition-opacity flex-shrink-0"
           >
             {isPlaying ? (
               <Pause className="h-4 w-4 fill-current" />
@@ -92,7 +94,7 @@ export function ClipPlayer({ audioUrl, duration: propDuration, onError }: ClipPl
 
           <div className="flex-1 min-w-0">
             {/* Progress bar */}
-            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+            <div className="h-1.5 bg-muted rounded-none overflow-hidden">
               <div
                 className="h-full bg-primary transition-all duration-100"
                 style={{ width: `${progress}%` }}

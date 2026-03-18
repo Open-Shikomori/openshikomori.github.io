@@ -1,5 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { RecordingState } from '../types';
+import { bufferToWave, getCleanAudioRange } from '../utils/audioUtils';
 
 interface AudioRecorderState {
   recordingState: RecordingState;
@@ -17,9 +19,10 @@ interface AudioRecorderActions {
   requestPermission: () => Promise<boolean>;
 }
 
-const MAX_RECORDING_DURATION = 30000; // 30 seconds max
+const MAX_RECORDING_DURATION = 50000; // 50 seconds max
 
 export function useAudioRecorder(): AudioRecorderState & AudioRecorderActions {
+  const { t } = useTranslation();
   const [recordingState, setRecordingState] = useState<RecordingState>('idle');
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -75,7 +78,7 @@ export function useAudioRecorder(): AudioRecorderState & AudioRecorderActions {
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
-          sampleRate: 16000, // Lower sample rate for speech
+          sampleRate: 44100, // Higher sample rate for better quality
           channelCount: 1, // Mono
         },
       });
@@ -101,7 +104,7 @@ export function useAudioRecorder(): AudioRecorderState & AudioRecorderActions {
       setError(null);
       audioChunksRef.current = [];
 
-      // Set up audio context for waveform visualization
+      // Set up audio context for waveform visualization and WAV conversion
       const audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
       const source = audioContext.createMediaStreamSource(streamRef.current!);
       const analyser = audioContext.createAnalyser();
@@ -109,7 +112,7 @@ export function useAudioRecorder(): AudioRecorderState & AudioRecorderActions {
       source.connect(analyser);
       analyserRef.current = analyser;
 
-      // Determine supported MIME type
+      // Determine supported MIME type (for the interim chunks)
       const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
         ? 'audio/webm;codecs=opus'
         : MediaRecorder.isTypeSupported('audio/mp4')
@@ -127,16 +130,45 @@ export function useAudioRecorder(): AudioRecorderState & AudioRecorderActions {
         }
       };
 
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(audioChunksRef.current, { type: mimeType });
-        setAudioBlob(blob);
-        setAudioUrl(URL.createObjectURL(blob));
+      mediaRecorder.onstop = async () => {
+        const tempBlob = new Blob(audioChunksRef.current, { type: mimeType });
+        
+        try {
+          // Convert to WAV using AudioContext
+          const arrayBuffer = await tempBlob.arrayBuffer();
+          const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+          
+          // Detect clean audio range
+          const range = getCleanAudioRange(audioBuffer);
+          
+          if (!range) {
+             setError(t('contribution.chat.silentError'));
+             setRecordingState('idle');
+             setAudioBlob(null);
+             setAudioUrl(null);
+             return;
+          }
+
+          const wavBlob = bufferToWave(audioBuffer, range.start, range.length);
+          
+          setAudioBlob(wavBlob);
+          setAudioUrl(URL.createObjectURL(wavBlob));
+        } catch (e) {
+          console.error('WAV conversion failed, falling back to original format', e);
+          setAudioBlob(tempBlob);
+          setAudioUrl(URL.createObjectURL(tempBlob));
+        }
 
         // Stop waveform animation
         if (animationFrameRef.current) {
           cancelAnimationFrame(animationFrameRef.current);
         }
         setWaveformData([]);
+        
+        // Close audio context
+        if (audioContext.state !== 'closed') {
+          audioContext.close();
+        }
       };
 
       mediaRecorder.onerror = () => {
@@ -193,7 +225,7 @@ export function useAudioRecorder(): AudioRecorderState & AudioRecorderActions {
       animationFrameRef.current = null;
     }
 
-    // Close audio context
+    // Stop analyser
     if (analyserRef.current) {
       analyserRef.current = null;
     }

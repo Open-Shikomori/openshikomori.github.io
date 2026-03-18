@@ -69,80 +69,34 @@ export function ContributionWorkspace({ user }: ContributionWorkspaceProps) {
   };
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] bg-background overflow-x-hidden">
-      <main className="w-full flex flex-col min-w-0 bg-muted/10 min-h-[calc(100vh-3.5rem)]">
-        {/* Content Stage */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar">
-          {view === 'contribute' ? (
-            <div className="w-full max-w-5xl mx-auto p-4 md:p-8 lg:p-12 space-y-8">
-              {selectedHistoryItem ? (
-                <div className="flex items-center justify-between mb-4">
-                  <Button variant="ghost" size="sm" onClick={handleBackToWork} className="gap-2 rounded-none">
-                    <ArrowLeft className="h-4 w-4" />
-                    {t('common.back', { defaultValue: 'Back to task' })}
-                  </Button>
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest bg-muted px-3 py-1 rounded-none">
-                    {t('contribution.history.reviewing', { defaultValue: 'Reviewing Entry' })}
-                  </span>
-                </div>
-              ) : (
-                /* Mode Switcher Pill */
-                <div className="flex justify-center">
-                  <div className="inline-flex p-1 bg-background border border-border rounded-none shadow-sm">
-                    <button
-                      onClick={() => setActiveMode('record')}
-                      className={cn(
-                        "flex items-center gap-2 px-8 py-3 rounded-none text-sm font-bold transition-all duration-200",
-                        activeMode === 'record'
-                          ? "bg-primary text-primary-foreground shadow-md ring-1 ring-primary/20"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                      )}
-                    >
-                      <Mic className="h-4 w-4" />
-                      {t('contribution.modes.record', { defaultValue: 'Speak' })}
-                    </button>
-                    <button
-                      onClick={() => setActiveMode('correct')}
-                      className={cn(
-                        "flex items-center gap-2 px-8 py-3 rounded-none text-sm font-bold transition-all duration-200",
-                        activeMode === 'correct'
-                          ? "bg-primary text-primary-foreground shadow-md ring-1 ring-primary/20"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                      )}
-                    >
-                      <Edit3 className="h-4 w-4" />
-                      {t('contribution.modes.correct', { defaultValue: 'Listen' })}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Work Area Stage */}
-              <div className="bg-card border border-border rounded-none shadow-2xl shadow-primary/5 overflow-hidden min-h-[600px] flex flex-col transition-all duration-500 hover:shadow-primary/10">
-                <WorkArea
-                  mode={activeMode}
-                  userId={user.uid}
-                  onContributionComplete={handleContributionComplete}
-                  selectedItem={selectedHistoryItem}
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <StatsPanel
-                userStats={userStats}
-                streak={dashboard?.stats.currentStreak ?? 0}
-                personalBestStreak={dashboard?.stats.bestStreak ?? 0}
-                badges={dashboard?.badges ?? []}
-                weeklyData={dashboard?.weeklyData ?? []}
-                dailyProgress={dailyProgress}
-                history={history}
-                totalXP={totalXP}
-                totalWords={totalWords}
-              />
-            </div>
-          )}
-        </div>
+    <div className="min-h-[calc(100vh-3.5rem)] bg-background overflow-hidden flex flex-col">
+      <main className="w-full flex-1 flex flex-col min-w-0 bg-background relative">
+        {view === 'contribute' ? (
+          <div className="flex-1 flex flex-col h-full absolute inset-0">
+            <WorkArea
+              mode={activeMode}
+              userId={user.uid}
+              onContributionComplete={handleContributionComplete}
+              selectedItem={selectedHistoryItem}
+              onModeChange={setActiveMode}
+              onBackToWork={handleBackToWork}
+            />
+          </div>
+        ) : (
+          <div className="w-full h-full overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <StatsPanel
+              userStats={userStats}
+              streak={dashboard?.stats.currentStreak ?? 0}
+              personalBestStreak={dashboard?.stats.bestStreak ?? 0}
+              badges={dashboard?.badges ?? []}
+              weeklyData={dashboard?.weeklyData ?? []}
+              dailyProgress={dailyProgress}
+              history={history}
+              totalXP={totalXP}
+              totalWords={totalWords}
+            />
+          </div>
+        )}
       </main>
     </div>
   );
