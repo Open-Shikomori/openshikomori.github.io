@@ -18,6 +18,8 @@ export const common = {
     repoPill: "كود عام وبيانات صوتية خاصة",
   },
   or: "أو",
+  showSuggestion: "إظهار النص",
+  hideSuggestion: "إخفاء النص",
   auth: {
     entryModal: {
       signInTitle: "مرحبًا بعودتك",

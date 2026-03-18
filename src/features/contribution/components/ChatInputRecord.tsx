@@ -19,6 +19,14 @@ export function ChatInputRecord({ onComplete, onGetSuggestion, isSuggesting, sug
   const { t } = useTranslation();
   
   const [dialect, setDialect] = useState<DialectOption['code'] | undefined>(undefined);
+  const [isSuggestionVisible, setIsSuggestionVisible] = useState(true);
+
+  // Auto-show when a new suggestion comes in
+  useEffect(() => {
+    if (suggestedPhrase) {
+      setIsSuggestionVisible(true);
+    }
+  }, [suggestedPhrase]);
 
   const dialects: { code: DialectOption['code'] }[] = [
     { code: 'shingazidja' },
@@ -86,44 +94,79 @@ export function ChatInputRecord({ onComplete, onGetSuggestion, isSuggesting, sug
   const hasRecording = recordingState === 'stopped' && audioBlob;
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Top Bar - Suggestion Area Only */}
-      <div className="px-2 min-h-[20px]">
+    <div className="flex flex-col gap-4 relative">
+      {/* Floating Suggestion Area */}
+      <div className="absolute bottom-[calc(100%+1rem)] left-0 right-0 z-20 pointer-events-none">
         <AnimatePresence mode="wait">
           {isSuggesting && !suggestedPhrase ? (
             <motion.div
               key="loading-msg"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="py-1"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="mx-2 py-2 px-4 bg-background/80 backdrop-blur-sm border border-border shadow-lg inline-block rounded-none"
             >
               <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 animate-pulse">
                 {t('contribution.chat.gettingSuggestion')}
               </span>
             </motion.div>
           ) : suggestedPhrase && !isRecording && !hasRecording ? (
-            <motion.div
-              key={suggestedPhrase}
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -5 }}
-              className="flex flex-col gap-1.5"
-            >
-              <span className="text-[10px] font-black uppercase tracking-widest text-primary">
-                {t('contribution.chat.suggestionPrompt')}
-              </span>
-              <p className="text-lg font-bold italic text-foreground leading-relaxed">
-                "{suggestedPhrase}"
-              </p>
-            </motion.div>
+            <>
+              {isSuggestionVisible ? (
+                <motion.div
+                  key="suggestion-visible"
+                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                  className="mx-2 p-4 bg-card border-2 border-primary/20 shadow-2xl flex flex-col gap-1.5 pointer-events-auto rounded-none relative group"
+                >
+                  {/* Decorative corner */}
+                  <div className="absolute -bottom-2 left-6 w-4 h-4 bg-card border-r-2 border-b-2 border-primary/20 rotate-45" />
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-1.5">
+                      <span className="h-1.5 w-1.5 bg-primary animate-pulse" />
+                      {t('contribution.chat.suggestionPrompt')}
+                    </span>
+                    <button 
+                      onClick={() => setIsSuggestionVisible(false)}
+                      className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-destructive transition-colors"
+                    >
+                      {t('common.hideSuggestion', { defaultValue: 'Hide' })}
+                    </button>
+                  </div>
+                  <p className="text-lg font-bold italic text-foreground leading-relaxed">
+                    {suggestedPhrase}
+                  </p>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="suggestion-hidden"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="mx-2 pointer-events-auto"
+                >
+                  <button
+                    onClick={() => setIsSuggestionVisible(true)}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-background/90 backdrop-blur-sm border border-border shadow-md hover:bg-background transition-colors rounded-none"
+                  >
+                    <span className="h-1.5 w-1.5 bg-primary animate-pulse" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                      {t('common.showSuggestion', { defaultValue: 'Show Prompt' })}
+                    </span>
+                  </button>
+                </motion.div>
+              )}
+            </>
           ) : null}
         </AnimatePresence>
       </div>
 
-      <div className="w-full flex items-end gap-2 bg-muted/50 p-2 rounded-none border border-border">
+      <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-end gap-2 bg-muted/50 p-2 rounded-none border border-border">
+
         {/* Dynamic Content Area */}
-        <div className="flex-1 min-h-[44px] flex items-center px-4 bg-background rounded-none border border-border shadow-sm overflow-hidden">
+        <div className="flex-1 min-h-[44px] flex items-center px-4 bg-background rounded-none border border-border shadow-sm overflow-hidden order-1 sm:order-none">
           <AnimatePresence mode="wait">
             {!isRecording && !hasRecording && (
               <motion.div
@@ -207,58 +250,60 @@ export function ChatInputRecord({ onComplete, onGetSuggestion, isSuggesting, sug
           </AnimatePresence>
         </div>
 
-        {/* Dialect Selector - Near the send button */}
-        {!isRecording && !hasRecording && (
-          <div className="shrink-0 flex items-center gap-2 bg-background h-[44px] px-3 border border-border rounded-none shadow-sm">
-            <Languages className="h-3.5 w-3.5 text-muted-foreground" />
-            <select
-              value={dialect || ''}
-              onChange={(e) => setDialect(e.target.value as DialectOption['code'] || undefined)}
-              className="bg-transparent text-[10px] font-black uppercase tracking-[0.1em] focus:outline-none cursor-pointer"
-            >
-              <option value="" className="bg-background text-foreground">{t('contribution.editor.anyDialect')}</option>
-              {dialects.map((d) => (
-                <option key={d.code} value={d.code} className="bg-background text-foreground">
-                  {t(`contribution.dialects.${d.code}`)}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {/* Action Button */}
-        <div className="shrink-0 flex items-center justify-center h-[44px]">
-          {!hasRecording ? (
-            <Button
-              type="button"
-              size="icon"
-              onClick={isRecording ? handleStop : handleStart}
-              disabled={recordingState === 'requesting'}
-              className={cn(
-                "h-11 w-11 rounded-none shadow-sm transition-all duration-200 border-none",
-                isRecording 
-                  ? "bg-red-500 hover:bg-red-600 text-white" 
-                  : "bg-primary hover:bg-primary/90 text-primary-foreground"
-              )}
-            >
-              {recordingState === 'requesting' ? (
-                <span className="h-4 w-4 border-2 border-current border-t-transparent rounded-none animate-spin" />
-              ) : isRecording ? (
-                <Square className="h-4 w-4 fill-current" />
-              ) : (
-                <Mic className="h-5 w-5" />
-              )}
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              size="icon"
-              onClick={handleSubmit}
-              className="h-11 w-11 rounded-none bg-primary hover:bg-primary/90 text-primary-foreground shadow-md transition-all duration-200 border-none"
-            >
-              <Send className="h-4 w-4 ml-0.5" />
-            </Button>
+        <div className="flex items-center gap-2 order-2 sm:order-none">
+          {/* Dialect Selector - Near the send button */}
+          {!isRecording && !hasRecording && (
+            <div className="flex-1 sm:flex-none flex items-center gap-2 bg-background h-[44px] px-3 border border-border rounded-none shadow-sm">
+              <Languages className="h-3.5 w-3.5 text-muted-foreground" />
+              <select
+                value={dialect || ''}
+                onChange={(e) => setDialect(e.target.value as DialectOption['code'] || undefined)}
+                className="bg-transparent text-[10px] font-black uppercase tracking-[0.1em] focus:outline-none cursor-pointer flex-1 sm:flex-none min-w-0"
+              >
+                <option value="" className="bg-background text-foreground">{t('contribution.editor.anyDialect')}</option>
+                {dialects.map((d) => (
+                  <option key={d.code} value={d.code} className="bg-background text-foreground">
+                    {t(`contribution.dialects.${d.code}`)}
+                  </option>
+                ))}
+              </select>
+            </div>
           )}
+
+          {/* Action Button */}
+          <div className="shrink-0 flex items-center justify-center h-[44px]">
+            {!hasRecording ? (
+              <Button
+                type="button"
+                size="icon"
+                onClick={isRecording ? handleStop : handleStart}
+                disabled={recordingState === 'requesting'}
+                className={cn(
+                  "h-11 w-11 rounded-none shadow-sm transition-all duration-200 border-none",
+                  isRecording 
+                    ? "bg-red-500 hover:bg-red-600 text-white" 
+                    : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                )}
+              >
+                {recordingState === 'requesting' ? (
+                  <span className="h-4 w-4 border-2 border-current border-t-transparent rounded-none animate-spin" />
+                ) : isRecording ? (
+                  <Square className="h-4 w-4 fill-current" />
+                ) : (
+                  <Mic className="h-5 w-5" />
+                )}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                size="icon"
+                onClick={handleSubmit}
+                className="h-11 w-11 rounded-none bg-primary hover:bg-primary/90 text-primary-foreground shadow-md transition-all duration-200 border-none"
+              >
+                <Send className="h-4 w-4 ml-0.5" />
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>

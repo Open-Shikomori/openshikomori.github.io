@@ -18,6 +18,8 @@ export const common = {
     repoPill: "Public code, private dataset",
   },
   or: "or",
+  showSuggestion: "Show Suggestion",
+  hideSuggestion: "Hide Suggestion",
   auth: {
     entryModal: {
       signInTitle: "Welcome Back",

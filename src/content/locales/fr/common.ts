@@ -18,6 +18,8 @@ export const common = {
     repoPill: "Code public, jeu de donnees prive",
   },
   or: "ou",
+  showSuggestion: "Afficher l'invitation",
+  hideSuggestion: "Masquer l'invitation",
   auth: {
     entryModal: {
       signInTitle: "Bon Retour",
