@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Plus, Edit2, Trash2, CheckCircle } from 'lucide-react';
+import { Plus, Edit2, Trash2, CheckCircle } from 'lucide-react';
 import { supabase } from '../../contribution/services/supabase';
 import { avatarOptions } from '../../contribution/data/avatars';
 import { DataTable } from '@/components/ui/data-table';
@@ -114,7 +114,7 @@ export function AdminContributorsPage() {
     {
       accessorKey: "isPublic",
       header: "Status",
-      cell: ({ row }) => (
+      cell: () => (
         <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-green-500/10 text-green-500 border border-green-500/20">
           <CheckCircle className="h-3 w-3 mr-1.5" />
           Public

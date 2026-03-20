@@ -19,19 +19,22 @@ export function ContributionPanel() {
   const [showConvertModal, setShowConvertModal] = useState(false);
   const [recordingStep, setRecordingStep] = useState<'record' | 'transcribe'>('record');
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
+  const [recordedDuration, setRecordedDuration] = useState(0);
 
   const { user, loading: authLoading, hasPublicProfile, refreshUser } = useAuth();
   const { isSubmitting, error, success, submitContribution, reset } = useCreateContribution(user?.uid);
   const { isUpdating, updateProfile } = useUpdateProfile(user?.uid);
   const { convertAnonymousToPermanent, isAuthLoading, authError, clearAuthError } = useContribution();
 
-  const handleRecordingComplete = (blob: Blob) => {
+  const handleRecordingComplete = (blob: Blob, duration: number) => {
     setRecordedBlob(blob);
+    setRecordedDuration(duration);
     setRecordingStep('transcribe');
   };
 
   const handleCancelRecording = () => {
     setRecordedBlob(null);
+    setRecordedDuration(0);
     setRecordingStep('record');
     reset();
   };
@@ -40,6 +43,7 @@ export function ContributionPanel() {
     transcription: string;
     language: 'comorian' | 'french' | 'arabic';
     dialect?: 'shingazidja' | 'shindzuani' | 'shimwali' | 'shimaore';
+    duration: number;
   }) => {
     if (!recordedBlob || !user) return;
 
@@ -48,6 +52,7 @@ export function ContributionPanel() {
       data.transcription,
       data.language,
       data.dialect,
+      data.duration,
       user.profile,
       !hasPublicProfile
     );
@@ -56,6 +61,7 @@ export function ContributionPanel() {
       setTimeout(() => {
         setRecordingStep('record');
         setRecordedBlob(null);
+        setRecordedDuration(0);
         reset();
         refreshUser();
       }, 2000);
@@ -127,6 +133,7 @@ export function ContributionPanel() {
             reset();
             setRecordingStep('record');
             setRecordedBlob(null);
+            setRecordedDuration(0);
           }}
           className="mt-6 h-11 px-6 bg-primary text-primary-foreground font-medium rounded hover:opacity-90 transition-opacity"
         >
@@ -245,6 +252,7 @@ export function ContributionPanel() {
           ) : (
             <TranscriptionEditor
               audioUrl={recordedBlob ? URL.createObjectURL(recordedBlob) : null}
+              duration={recordedDuration}
               onSubmit={handleSubmitContribution}
               onBack={handleCancelRecording}
               isSubmitting={isSubmitting}

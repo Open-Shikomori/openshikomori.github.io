@@ -1,5 +1,4 @@
-import { motion } from "motion/react";
-import { Settings, Save, Shield, AlertTriangle } from "lucide-react";
+import { Save, Shield, AlertTriangle } from "lucide-react";
 
 export function AdminSettingsPage() {
   return (

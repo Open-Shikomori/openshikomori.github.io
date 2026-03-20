@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Edit3, Play, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { CheckCircle, XCircle, Clock } from 'lucide-react';
 import { supabase } from '../../contribution/services/supabase';
 import { reviewCorrection } from '../../contribution/services/clips';
 import type { Correction } from '../../contribution/types';

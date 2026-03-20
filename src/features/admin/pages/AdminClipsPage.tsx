@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Mic, Play, CheckCircle, XCircle } from 'lucide-react';
+import { Play, CheckCircle, XCircle } from 'lucide-react';
 import { supabase } from '../../contribution/services/supabase';
 import type { Clip } from '../../contribution/types';
 import { DataTable } from '@/components/ui/data-table';

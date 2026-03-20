@@ -1,9 +1,4 @@
-import {
-  Link,
-  createHashRouter,
-  isRouteErrorResponse,
-  useRouteError,
-} from "react-router";
+import { createHashRouter } from "react-router";
 
 import { AboutPage } from "@/pages/AboutPage";
 import { DatasetPage } from "@/pages/DatasetPage";
@@ -119,4 +114,3 @@ export const appRouter = createHashRouter([
     errorElement: <ErrorPage />,
   },
 ]);
-

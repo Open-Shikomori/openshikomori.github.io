@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ChevronLeft, ChevronRight, MoreHorizontal, Settings2 } from "lucide-react"
+import { ChevronLeft, ChevronRight, Settings2 } from "lucide-react"
 
 import {
   Table,
@@ -23,7 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -31,6 +31,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -86,15 +87,14 @@ export function DataTable<TData, TValue>({
           )}
         </div>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="ml-auto hidden h-9 lg:flex border-border bg-background"
-            >
-              <Settings2 className="mr-2 h-4 w-4" />
-              View
-            </Button>
+          <DropdownMenuTrigger
+            className={cn(
+              buttonVariants({ variant: "outline", size: "sm" }),
+              "ml-auto hidden h-9 border-border bg-background lg:flex"
+            )}
+          >
+            <Settings2 className="mr-2 h-4 w-4" />
+            View
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[150px] bg-popover border-border">
             {table
