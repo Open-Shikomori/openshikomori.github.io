@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
 import { CheckCircle2, Circle, Clock } from "lucide-react";
@@ -6,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/shared/ui/PageHeader";
 import { SEO } from "@/shared/ui/SEO";
 import { JoinCommunityCTA } from "@/shared/ui/JoinCommunityCTA";
+import { fetchSiteData, usePublicSiteData } from "@/lib/site-data";
 import roadmapData from "@/data/roadmap.json";
 
 type RoadmapItem = {
@@ -22,14 +24,20 @@ type RoadmapPhase = {
 
 export function RoadmapPage() {
   const { t, i18n } = useTranslation();
+  const liveSiteData = usePublicSiteData(
+    { roadmap: roadmapData as any[], site_preferences: { showRoadmap: true } },
+    useCallback(() => fetchSiteData(), [])
+  );
+  const sourceRoadmap = liveSiteData.roadmap || roadmapData;
+  const showRoadmap = liveSiteData.site_preferences?.showRoadmap !== false;
 
-  const phases: RoadmapPhase[] = roadmapData.map((phase: any) => ({
+  const phases: RoadmapPhase[] = (sourceRoadmap as any[]).map((phase: any) => ({
     stage: t(phase.stage),
     period: t(phase.period),
     items: phase.items.map((item: any) => ({
       title: t(item.title),
       description: t(item.description),
-      status: item.status,
+      status: item.status as RoadmapItem["status"],
     })),
   }));
 
@@ -69,6 +77,18 @@ export function RoadmapPage() {
         title={t("roadmapPage.title")}
         subtitle={t("roadmapPage.subtitle")}
       />
+
+      {!showRoadmap ? (
+        <section className="w-full border-b border-border px-6 py-12 sm:px-12">
+          <div className="rounded-2xl border border-border bg-card p-8">
+            <p className="text-lg font-semibold text-foreground">Roadmap temporarily hidden</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              An administrator has disabled public roadmap visibility for now.
+            </p>
+          </div>
+        </section>
+      ) : (
+        <>
 
       {/* Legend */}
       <section className="w-full border-b border-border px-6 py-8 sm:px-12">
@@ -137,6 +157,8 @@ export function RoadmapPage() {
           ))}
         </div>
       </section>
+      </>
+      )}
 
       <JoinCommunityCTA />
     </main>

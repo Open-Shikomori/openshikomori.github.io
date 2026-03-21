@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { RouterProvider } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -26,67 +26,63 @@ describe("homepage public content", () => {
     await i18n.changeLanguage("en");
   });
 
-  it("shows the mission, milestone, trust, roadmap, and support surfaces in English", async () => {
+  it("shows the mission, milestone, trust, community, and support surfaces in English", async () => {
     renderHomepage();
 
     expect(
       await screen.findByRole("heading", {
-        name: /collect and safeguard comorian voices with a trustworthy public shell/i,
+        name: /comorian deserves ai that understands us/i,
       }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("button", {
-        name: /start recording/i,
-      }),
-    ).toHaveAttribute("data-section-target", "contribution-preview");
-    expect(
-      screen.getByRole("heading", {
-        name: /first target: enough reviewed speech to improve a comorian whisper model/i,
+        name: /contribute your voice/i,
       }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
-        name: /open-source in public, raw voices in private, consent explained in plain language/i,
+        name: /building the foundation for comorian ai/i,
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", {
-        name: /the roadmap is visible, but this release keeps attention on contribution readiness/i,
-      }),
+      screen.getByText(/your voice belongs to you/i),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
-        name: /support starts with conversation, repository visibility, and careful stewardship/i,
+        name: /our community/i,
       }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/open by design, private by default/i),
     ).toBeInTheDocument();
     expect(screen.getByRole("contentinfo")).toBeInTheDocument();
-    expect(screen.getAllByText(/public code, private dataset/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/our community/i)).toBeInTheDocument();
   });
 
-  it("keeps section jumps inside the homepage instead of changing the hash route", async () => {
+  it("keeps homepage jumps internal and leaves roadmap on its dedicated route", async () => {
     renderHomepage();
 
     const initialHash = window.location.hash;
-    const header = screen.getByRole("banner");
-
     fireEvent.click(
       await screen.findByRole("button", {
-        name: /start recording/i,
+        name: /how it works/i,
       }),
     );
 
     expect(window.location.hash).toBe(initialHash);
-    expect(scrollIntoViewMock).toHaveBeenCalled();
+    expect(scrollIntoViewMock).toHaveBeenCalledTimes(1);
 
     fireEvent.click(
-      within(header).getByRole("button", {
-        name: /support/i,
-      }),
+      screen.getAllByRole("link", { name: /roadmap/i }).at(-1)!,
     );
 
-    expect(window.location.hash).toBe(initialHash);
-    expect(screen.getByRole("contentinfo")).toBeInTheDocument();
-    expect(scrollIntoViewMock).toHaveBeenCalledTimes(2);
+    expect(window.location.hash).toBe("#/roadmap");
+    expect(scrollIntoViewMock).toHaveBeenCalledTimes(1);
+    expect(
+      await screen.findByRole("heading", {
+        name: /roadmap/i,
+      }),
+    ).toBeInTheDocument();
   });
 
   it("renders the same trust-first structure in Arabic", async () => {
@@ -96,22 +92,15 @@ describe("homepage public content", () => {
 
     expect(
       await screen.findByRole("heading", {
-        name: /اجمعوا الاصوات القمرية واحفظوها من خلال واجهة عامة موثوقة/i,
+        name: /اللغة القمرية تستحق ذكاء اصطناعيا يفهمنا/i,
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", {
-        name: /المصدر المفتوح يبقى في العلن، اما الاصوات الخام فتبقى في الخاص مع شرح هادئ للموافقة/i,
-      }),
+      screen.getByText(/صوتك ملكك/i),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
-        name: /الخارطة واضحة، لكن هذه النسخة تبقي التركيز على جاهزية المساهمة اولا/i,
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", {
-        name: /الدعم يبدأ بالمحادثة ووضوح المستودع وحسن ادارة البيانات/i,
+        name: /مجتمعنا/i,
       }),
     ).toBeInTheDocument();
   });

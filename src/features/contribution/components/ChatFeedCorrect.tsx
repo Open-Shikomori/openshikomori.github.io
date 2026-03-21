@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, Send, RotateCcw, CheckCircle, MapPin, SkipForward, Bot, Languages } from 'lucide-react';
 import { useCorrectionQueue, useSubmitCorrection } from '../hooks/useContributions';
 import { ClipPlayer } from './ClipPlayer';
-import type { Clip } from '../types';
+import type { Clip } from '@/types/contribution';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 

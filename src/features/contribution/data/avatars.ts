@@ -1,4 +1,4 @@
-import type { AvatarOption } from '../types';
+import type { AvatarOption } from '@/types/contribution';
 
 // Comorian cultural avatars - emoji based with custom backgrounds
 export const avatarOptions: AvatarOption[] = [

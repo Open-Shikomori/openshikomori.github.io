@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Clock, Mic, Edit3, CheckCircle2, XCircle, Timer } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { ContributionHistoryItem } from './types';
+import type { ContributionHistoryItem } from '@/types/contribution-ui';
 
 interface HistorySidebarProps {
   history: ContributionHistoryItem[];

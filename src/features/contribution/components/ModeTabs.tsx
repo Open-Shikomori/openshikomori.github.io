@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Mic, Edit3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { ContributionMode } from '../types';
+import type { ContributionMode } from '@/types/contribution';
 
 interface ModeTabsProps {
   value: ContributionMode;

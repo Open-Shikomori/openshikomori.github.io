@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { RecordingState } from '../types';
+import type { RecordingState } from '@/types/contribution';
 import { bufferToWave, getCleanAudioRange } from '../utils/audioUtils';
 
 interface AudioRecorderState {

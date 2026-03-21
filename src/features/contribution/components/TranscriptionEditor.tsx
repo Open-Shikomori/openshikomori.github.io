@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Check, Loader2 } from 'lucide-react';
-import type { LanguageOption, DialectOption } from '../types';
+import type { LanguageOption, DialectOption } from '@/types/contribution';
 import { useTranslation } from 'react-i18next';
 
 interface TranscriptionEditorProps {

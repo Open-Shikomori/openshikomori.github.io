@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Target, Flame, Trophy, TrendingUp, Sparkles, Medal } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { DailyProgress } from './types';
+import type { DailyProgress } from '@/types/contribution-ui';
 import { useLeaderboard } from '../hooks/useStats';
 
 interface ProgressSidebarProps {

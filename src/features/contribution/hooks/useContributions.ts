@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Clip, Correction, User, LanguageOption, DialectOption } from '../types';
+import type { Clip, Correction, User, LanguageOption, DialectOption } from '@/types/contribution';
 import {
   createClip,
   getClipsForCorrection,

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase, isSupabaseConfigured } from '../services/supabase';
-import type { User } from '../types';
+import type { User } from '@/types/contribution';
 
 interface AuthState {
   user: User | null;

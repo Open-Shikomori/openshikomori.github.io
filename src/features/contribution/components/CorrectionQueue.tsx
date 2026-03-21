@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, Send, RotateCcw, CheckCircle, Languages, MapPin, SkipForward } from 'lucide-react';
 import { useCorrectionQueue, useSubmitCorrection } from '../hooks/useContributions';
 import { ClipPlayer } from './ClipPlayer';
-import type { Clip, LanguageOption, DialectOption } from '../types';
+import type { Clip, LanguageOption, DialectOption } from '@/types/contribution';
 
 const languageLabels: Record<LanguageOption['code'], { en: string; fr: string }> = {
   comorian: { en: 'Comorian', fr: 'Comorien' },

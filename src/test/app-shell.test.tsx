@@ -14,14 +14,14 @@ describe("app shell", () => {
 
     expect(
       await screen.findByRole("heading", {
-        name: /collect and safeguard comorian voices with a trustworthy public shell/i,
+        name: /comorian deserves ai that understands us/i,
       }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByText(/this bun-powered app shell is the baseline for multilingual public pages/i),
+      screen.getByText(/most ai doesn't speak shikomori/i),
     ).toBeInTheDocument();
 
-    expect(screen.getByText(/phase 1 foundation/i)).toBeInTheDocument();
+    expect(screen.getByText(/building the foundation for comorian ai/i)).toBeInTheDocument();
   });
 });

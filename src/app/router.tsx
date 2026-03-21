@@ -20,7 +20,9 @@ import {
   AdminDashboardPage,
   AdminClipsPage,
   AdminCorrectionsPage,
+  AdminUsersPage,
   AdminContributorsPage,
+  AdminAdminsPage,
   AdminSettingsPage,
 } from "@/features/admin";
 
@@ -99,8 +101,16 @@ export const appRouter = createHashRouter([
         element: <AdminCorrectionsPage />,
       },
       {
+        path: "users",
+        element: <AdminUsersPage />,
+      },
+      {
         path: "contributors",
         element: <AdminContributorsPage />,
+      },
+      {
+        path: "admins",
+        element: <AdminAdminsPage />,
       },
       {
         path: "settings",

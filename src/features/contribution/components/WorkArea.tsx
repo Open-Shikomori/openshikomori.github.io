@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ContributionMode, ContributionHistoryItem } from './types';
+import type { ContributionMode } from '@/types/contribution';
+import type { ContributionHistoryItem } from '@/types/contribution-ui';
 import { Mic, Edit3, History, ArrowLeft, Info, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';

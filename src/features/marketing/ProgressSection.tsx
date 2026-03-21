@@ -1,18 +1,25 @@
+import { useCallback } from "react";
 import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
 import siteGoals from "@/data/goals.json";
+import { fetchSiteData, usePublicSiteData } from "@/lib/site-data";
 
 export function ProgressSection() {
   const { t } = useTranslation();
+  const liveSiteData = usePublicSiteData(
+    { goals: siteGoals },
+    useCallback(() => fetchSiteData(), [])
+  );
+  const activeGoals = liveSiteData.goals || siteGoals;
 
   const stats = [
-    { value: `${siteGoals.target_hours}+`, label: t("progress.hoursGoal") },
-    { value: `${siteGoals.target_dialects}`, label: t("progress.dialects") },
+    { value: `${activeGoals.target_hours}+`, label: t("progress.hoursGoal") },
+    { value: `${activeGoals.target_dialects}`, label: t("progress.dialects") },
     { value: "1", label: t("progress.openDataset") },
   ];
 
   return (
-    <section className="w-full border-y border-border bg-background">
+    <section className="w-full border-y border-border bg-background" id="contribution-preview">
       <div className="grid md:grid-cols-2">
         {/* Left: Big statement */}
         <div className="flex flex-col justify-center border-b border-border px-6 py-16 md:border-b-0 md:border-r md:px-12 lg:py-24">

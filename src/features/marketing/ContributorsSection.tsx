@@ -1,10 +1,11 @@
 import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { getAvatarById } from '../contribution/data/avatars';
-import type { User } from '../contribution/types';
+import type { User } from '@/types/contribution';
 import { cn } from '@/lib/utils';
 import { useContribution } from "../contribution/context/ContributionContext";
+import { fetchCommunity, fetchSiteData, usePublicSiteData } from "@/lib/site-data";
 import communityData from "@/data/community.json";
 
 function ContributorCard({ user }: { user: User }) {
@@ -75,9 +76,18 @@ function MarqueeRow({ items, direction = 'left', duration = 30 }: { items: User[
 export function ContributorsSection() {
   const { t } = useTranslation();
   const { openContributionModal } = useContribution();
-  
-  // Use static data from build time
-  const items = communityData as User[];
+  const items = usePublicSiteData(
+    communityData as User[],
+    useCallback(() => fetchCommunity(30), [])
+  );
+  const siteData = usePublicSiteData(
+    { site_preferences: { showCommunitySection: true } },
+    useCallback(() => fetchSiteData(), [])
+  );
+
+  if (siteData.site_preferences?.showCommunitySection === false) {
+    return null;
+  }
   
   return (
     <section className="relative w-full overflow-hidden border-b border-border bg-background py-24 sm:py-32">

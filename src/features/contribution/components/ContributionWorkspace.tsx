@@ -3,8 +3,8 @@ import { useLocation } from 'react-router';
 import { WorkArea } from './WorkArea';
 import { StatsPanel } from './StatsPanel';
 import { useUserDashboard } from '../hooks/useStats';
-import type { ContributionHistoryItem } from './types';
-import type { ContributionMode } from '../types';
+import type { ContributionHistoryItem } from '@/types/contribution-ui';
+import type { ContributionMode } from '@/types/contribution';
 
 interface ContributionWorkspaceProps {
   user: {

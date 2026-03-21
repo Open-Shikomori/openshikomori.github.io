@@ -9,7 +9,7 @@ import { useUpdateProfile } from '../hooks/useContributions';
 import { AlertTriangle } from 'lucide-react';
 import { isSupabaseConfigured } from '../services/supabase';
 import { useContribution } from '../context/ContributionContext';
-import type { User } from '../types';
+import type { User } from '@/types/contribution';
 
 export function ContributePage() {
   const { user, loading, refreshUser } = useAuth();

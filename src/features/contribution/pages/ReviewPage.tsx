@@ -4,7 +4,7 @@ import { Shield, AlertCircle, Loader2, CheckCircle, Check, X } from 'lucide-reac
 import { useAuth } from '../hooks/useAuth';
 import { useIsAdmin, useAdminReview } from '../hooks/useContributions';
 import { isSupabaseConfigured } from '../services/supabase';
-import type { Correction } from '../types';
+import type { Correction } from '@/types/contribution';
 
 export function ReviewPage() {
   const { user, loading: authLoading } = useAuth();

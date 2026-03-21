@@ -4,7 +4,7 @@ import {
   Trophy, Flame, Target, TrendingUp, Mic, Edit3, Lock,
   Sprout, Zap, BookOpen, Star, Award, Crown, Calendar, CalendarCheck, CheckCircle, Medal
 } from 'lucide-react';
-import type { Badge, DailyProgress, WeeklyData } from './types';
+import type { Badge, DailyProgress, WeeklyData } from '@/types/contribution-ui';
 import { useLeaderboard } from '../hooks/useStats';
 import { cn } from '@/lib/utils';
 

@@ -10,7 +10,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useCreateContribution, useUpdateProfile } from '../hooks/useContributions';
 import { isSupabaseConfigured } from '../services/supabase';
 import { useContribution } from '../context/ContributionContext';
-import type { ContributionMethod, User as UserType } from '../types';
+import type { ContributionMethod, User as UserType } from '@/types/contribution';
 
 export function ContributionPanel() {
   const { t } = useTranslation();

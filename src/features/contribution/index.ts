@@ -1,5 +1,5 @@
 // Types
-export * from './types';
+export * from '@/types/contribution';
 
 // Services
 export { supabase, isSupabaseConfigured, getCurrentUser, signOut } from './services/supabase';

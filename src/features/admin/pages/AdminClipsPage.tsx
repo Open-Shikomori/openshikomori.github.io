@@ -1,98 +1,76 @@
-import { useState, useEffect } from 'react';
-import { Play, CheckCircle, XCircle } from 'lucide-react';
-import { supabase } from '../../contribution/services/supabase';
-import type { Clip } from '../../contribution/types';
-import { DataTable } from '@/components/ui/data-table';
-import { type ColumnDef } from '@tanstack/react-table';
+import { useEffect, useState } from "react";
+import { Edit3, PlayCircle, Waves } from "lucide-react";
+import { type ColumnDef } from "@tanstack/react-table";
+
+import { DataTable } from "@/components/ui/data-table";
+
+import { AdminClipEditorDialog } from "../components/AdminClipEditorDialog";
+import { listAdminClips, updateAdminClip } from "../services/adminData";
+import type { AdminClipRecord } from "@/types/admin";
+
+function StatusBadge({ status }: { status: AdminClipRecord["status"] }) {
+  const tones =
+    status === "approved"
+      ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+      : status === "rejected"
+        ? "border-destructive/20 bg-destructive/10 text-destructive"
+        : "border-amber-200 bg-amber-50 text-amber-700";
+
+  return (
+    <span className={`inline-flex rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-widest ${tones}`}>
+      {status}
+    </span>
+  );
+}
 
 export function AdminClipsPage() {
-  const [clips, setClips] = useState<Clip[]>([]);
+  const [clips, setClips] = useState<AdminClipRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+  const [error, setError] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "approved" | "rejected">("pending");
+  const [languageFilter, setLanguageFilter] = useState("all");
+  const [editingClip, setEditingClip] = useState<AdminClipRecord | null>(null);
 
   useEffect(() => {
-    fetchClips();
-  }, [statusFilter]);
+    void loadClips();
+  }, [statusFilter, languageFilter]);
 
-  const fetchClips = async () => {
-    if (!supabase) return;
+  async function loadClips() {
     setLoading(true);
-
-    let query = supabase
-      .from('clips')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (statusFilter !== 'all') {
-      query = query.eq('status', statusFilter);
+    setError(null);
+    try {
+      setClips(
+        await listAdminClips({
+          status: statusFilter,
+          language: languageFilter,
+        })
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load clips");
+    } finally {
+      setLoading(false);
     }
+  }
 
-    const { data, error } = await (query.limit(100) as any);
+  async function handleSaveClip(payload: Parameters<typeof updateAdminClip>[0]) {
+    await updateAdminClip(payload);
+    await loadClips();
+  }
 
-    if (error) {
-      console.error('Error fetching clips:', error);
-    } else {
-      setClips((data || []).map((row: any) => ({
-        id: row.id,
-        audioUrl: row.audio_url,
-        duration: row.duration,
-        language: row.language,
-        dialect: row.dialect,
-        transcription: { text: row.transcription, source: 'manual' },
-        contributedBy: row.contributed_by,
-        contributedAt: new Date(row.created_at),
-        status: row.status,
-        correctionsCount: row.correction_count,
-        isDuplicate: row.is_duplicate,
-        isAnonymous: false,
-      } as Clip)));
-    }
+  const languages = Array.from(new Set(clips.map((clip) => clip.language))).sort();
 
-    setLoading(false);
-  };
-
-  const handleStatusChange = async (clipId: string, newStatus: 'approved' | 'rejected') => {
-    if (!supabase) return;
-
-    const { error } = await (supabase
-      .from('clips')
-      .update({ status: newStatus, reviewed_at: new Date().toISOString() } as any)
-      .eq('id', clipId) as any);
-
-    if (!error) {
-      fetchClips();
-    }
-  };
-
-  const columns: ColumnDef<Clip>[] = [
+  const columns: ColumnDef<AdminClipRecord>[] = [
     {
-      accessorKey: "audioUrl",
-      header: "Audio",
+      accessorKey: "transcription",
+      header: "Clip",
       cell: ({ row }) => {
         const clip = row.original;
         return (
-          <button className="flex items-center gap-3 text-primary font-bold transition-transform hover:scale-105">
-            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <Play className="h-4 w-4" fill="currentColor" />
-            </div>
-            <span className="text-xs uppercase tracking-widest font-black">{Math.round(clip.duration)}s</span>
-          </button>
-        );
-      },
-    },
-    {
-      id: "transcription",
-      accessorFn: (row) => row.transcription.text,
-      header: "Transcription",
-      cell: ({ row }) => {
-        const text = row.original.transcription.text;
-        const id = row.original.id;
-        return (
-          <div>
-            <p className="text-sm text-foreground font-medium max-w-xs truncate" title={text}>
-              {text}
+          <div className="min-w-[260px]">
+            <p className="font-semibold text-foreground">{clip.transcription}</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {clip.contributorName} • {Math.round(clip.duration)}s
             </p>
-            <p className="text-[10px] text-muted-foreground font-mono mt-1 opacity-50">ID: {id.slice(0, 8)}...</p>
           </div>
         );
       },
@@ -101,92 +79,128 @@ export function AdminClipsPage() {
       accessorKey: "language",
       header: "Language",
       cell: ({ row }) => (
-        <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-muted text-foreground border border-border">
-          {row.getValue("language")}
-        </span>
+        <div className="text-xs text-muted-foreground">
+          <p className="font-semibold capitalize text-foreground">{row.original.language}</p>
+          <p>{row.original.dialect || "No dialect"}</p>
+        </div>
       ),
     },
     {
       accessorKey: "status",
       header: "Status",
-      cell: ({ row }) => {
-        const status = row.getValue("status") as string;
-        return (
-          <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-            status === 'approved' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
-            status === 'rejected' ? 'bg-destructive/10 text-destructive border-destructive/20' :
-            'bg-amber-500/10 text-amber-500 border-amber-500/20'
-          }`}>
-            {status}
-          </span>
-        );
-      },
+      cell: ({ row }) => (
+        <div className="space-y-2">
+          <StatusBadge status={row.original.status} />
+          {row.original.isDuplicate ? (
+            <p className="text-[10px] uppercase tracking-widest text-destructive">Duplicate flagged</p>
+          ) : null}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "correctionCount",
+      header: "Corrections",
+      cell: ({ row }) => <span className="font-semibold text-foreground">{row.original.correctionCount}</span>,
+    },
+    {
+      id: "audio",
+      header: "Audio",
+      cell: ({ row }) => (
+        <audio controls className="w-52" src={row.original.audioUrl}>
+          <PlayCircle className="h-4 w-4" />
+        </audio>
+      ),
     },
     {
       id: "actions",
       header: "Actions",
-      cell: ({ row }) => {
-        const clip = row.original;
-        if (clip.status !== 'pending') {
-          return <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 italic">Reviewed</span>;
-        }
-
-        return (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => handleStatusChange(clip.id, 'approved')}
-              className="h-10 w-10 flex items-center justify-center text-green-500 hover:bg-green-500 hover:text-white rounded-lg transition-all border border-green-500/20"
-              title="Approve"
-            >
-              <CheckCircle className="h-5 w-5" />
-            </button>
-            <button
-              onClick={() => handleStatusChange(clip.id, 'rejected')}
-              className="h-10 w-10 flex items-center justify-center text-destructive hover:bg-destructive hover:text-white rounded-lg transition-all border border-destructive/20"
-              title="Reject"
-            >
-              <XCircle className="h-5 w-5" />
-            </button>
-          </div>
-        );
-      },
+      cell: ({ row }) => (
+        <button
+          onClick={() => setEditingClip(row.original)}
+          className="inline-flex h-10 items-center justify-center rounded-lg border border-border px-3 text-[10px] font-black uppercase tracking-widest text-foreground transition-colors hover:bg-muted"
+        >
+          <Edit3 className="mr-2 h-3.5 w-3.5" />
+          Review
+        </button>
+      ),
     },
   ];
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Clips</h1>
-          <p className="text-muted-foreground mt-1 text-sm uppercase tracking-widest font-black">Manage audio contributions</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Clip Moderation</h1>
+          <p className="mt-1 text-sm uppercase tracking-widest text-muted-foreground">
+            Review raw recordings, final transcripts, and duplicate flags
+          </p>
         </div>
-
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap gap-3">
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
-            className="h-12 px-4 rounded-lg border border-input bg-card text-[10px] font-black uppercase tracking-widest text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer"
+            onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)}
+            className="h-11 rounded-lg border border-input bg-background px-4 text-[10px] font-black uppercase tracking-widest"
           >
-            <option value="all">All Status</option>
-            <option value="pending">Pending Review</option>
+            <option value="all">All statuses</option>
+            <option value="pending">Pending</option>
             <option value="approved">Approved</option>
             <option value="rejected">Rejected</option>
           </select>
+          <select
+            value={languageFilter}
+            onChange={(event) => setLanguageFilter(event.target.value)}
+            className="h-11 rounded-lg border border-input bg-background px-4 text-[10px] font-black uppercase tracking-widest"
+          >
+            <option value="all">All languages</option>
+            {languages.map((language) => (
+              <option key={language} value={language}>
+                {language}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={() => void loadClips()}
+            className="inline-flex h-11 items-center justify-center rounded-lg border border-border bg-background px-5 text-[10px] font-black uppercase tracking-widest text-foreground transition-colors hover:bg-muted"
+          >
+            Refresh
+          </button>
         </div>
       </div>
 
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <div className="flex items-center gap-3">
+          <Waves className="h-5 w-5 text-primary" />
+          <div>
+            <h2 className="text-lg font-bold tracking-tight text-foreground">{clips.length} clips in scope</h2>
+            <p className="text-sm text-muted-foreground">
+              Filter by moderation state or language, then open a clip to update transcript and status.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {error ? (
+        <div className="rounded-xl border border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">
+          {error}
+        </div>
+      ) : null}
+
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-4">
-          <div className="h-10 w-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Loading clips...</p>
+        <div className="rounded-2xl border border-border bg-card p-16 text-center text-sm text-muted-foreground">
+          Loading clips...
         </div>
       ) : (
-        <DataTable 
-          columns={columns} 
-          data={clips} 
-          searchKey="transcription"
-        />
+        <DataTable columns={columns} data={clips} searchKey="transcription" />
       )}
+
+      <AdminClipEditorDialog
+        open={Boolean(editingClip)}
+        clip={editingClip}
+        onOpenChange={(open) => {
+          if (!open) setEditingClip(null);
+        }}
+        onSave={handleSaveClip}
+      />
     </div>
   );
 }

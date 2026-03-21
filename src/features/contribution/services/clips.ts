@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
-import type { Clip, Correction, User } from '../types';
+import type { Clip, Correction, User } from '@/types/contribution';
 
 // Create a new clip
 export async function createClip(
@@ -273,5 +273,4 @@ function convertCorrectionRow(row: any): Correction {
     reviewNote: row.review_note || null,
   };
 }
-
 

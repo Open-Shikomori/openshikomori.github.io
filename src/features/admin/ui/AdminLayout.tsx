@@ -5,10 +5,12 @@ import {
   Mic,
   Edit3,
   Users,
+  UserRound,
   Settings,
   LogOut,
   Menu,
-  Shield
+  Shield,
+  ShieldCheck,
 } from 'lucide-react';
 import { useAdminAuth } from '../hooks/useAdminAuth';
 
@@ -16,7 +18,9 @@ const sidebarItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
   { icon: Mic, label: 'Clips', path: '/admin/clips' },
   { icon: Edit3, label: 'Corrections', path: '/admin/corrections' },
+  { icon: UserRound, label: 'Users', path: '/admin/users' },
   { icon: Users, label: 'Contributors', path: '/admin/contributors' },
+  { icon: ShieldCheck, label: 'Admins', path: '/admin/admins' },
   { icon: Settings, label: 'Settings', path: '/admin/settings' },
 ];
 

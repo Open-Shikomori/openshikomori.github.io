@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import type { DialectOption } from '../types';
+import type { DialectOption } from '@/types/contribution';
 
 interface ChatInputRecordProps {
   onComplete: (blob: Blob, duration: number, metadata: { language: string, dialect?: string }) => void;

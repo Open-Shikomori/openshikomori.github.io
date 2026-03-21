@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { TranscriptionEditor } from './TranscriptionEditor';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import type { ContributionHistoryItem } from './types';
+import type { ContributionHistoryItem } from '@/types/contribution-ui';
 
 interface ChatFeedRecordProps {
   userId: string | undefined;

@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
 import { Database, Mic, FileAudio, Users, CheckCircle2 } from "lucide-react";
@@ -6,24 +7,34 @@ import { Progress } from "@/components/ui/progress";
 import { PageHeader } from "@/shared/ui/PageHeader";
 import { SEO } from "@/shared/ui/SEO";
 import { JoinCommunityCTA } from "@/shared/ui/JoinCommunityCTA";
+import { fetchDatasetStats, fetchSiteData, usePublicSiteData } from "@/lib/site-data";
 import siteStats from "@/data/stats.json";
 import siteGoals from "@/data/goals.json";
 
 export function DatasetPage() {
   const { t, i18n } = useTranslation();
+  const liveStats = usePublicSiteData(
+    siteStats,
+    useCallback(() => fetchDatasetStats<typeof siteStats>(), [])
+  );
+  const liveSiteData = usePublicSiteData(
+    { goals: siteGoals },
+    useCallback(() => fetchSiteData(), [])
+  );
+  const activeGoals = liveSiteData.goals || siteGoals;
 
-  const totalHours = Math.round((siteStats.total_duration_seconds || 0) / 3600);
+  const totalHours = Math.round((liveStats.total_duration_seconds || 0) / 3600);
 
   const stats = [
     {
       icon: Mic,
-      value: (siteStats.total_speakers || 0).toLocaleString(),
+      value: (liveStats.total_speakers || 0).toLocaleString(),
       label: t("dataset.stats.speakers"),
       description: t("dataset.stats.speakersDesc"),
     },
     {
       icon: FileAudio,
-      value: (siteStats.total_clips || 0).toLocaleString(),
+      value: (liveStats.total_clips || 0).toLocaleString(),
       label: t("dataset.stats.clips"),
       description: t("dataset.stats.clipsDesc"),
     },
@@ -35,24 +46,24 @@ export function DatasetPage() {
     },
     {
       icon: Users,
-      value: Object.keys(siteStats.categories || {}).length.toString(),
+      value: Object.keys(liveStats.categories || {}).length.toString(),
       label: t("dataset.stats.languages"),
       description: t("dataset.stats.languagesDesc"),
     },
   ];
 
   const getLanguageProgress = (cat: string) => {
-    const catStats = (siteStats as any)?.categories?.[cat];
+    const catStats = (liveStats as any)?.categories?.[cat];
     const durationSeconds = catStats?.duration_seconds || 0;
     const hours = durationSeconds / 3600;
-    const goalHours = (siteGoals.target_languages_hours as any)?.[cat] || 10;
+    const goalHours = (activeGoals.target_languages_hours as any)?.[cat] || 10;
     return {
       hours: hours.toFixed(1),
       percent: Math.min(100, (hours / goalHours) * 100)
     };
   };
 
-  const categories = Object.keys(siteGoals.target_languages_hours || {});
+  const categories = Object.keys(activeGoals.target_languages_hours || {});
 
   return (
     <>
@@ -120,7 +131,7 @@ export function DatasetPage() {
             >
               {categories.map((cat) => {
                 const { hours, percent } = getLanguageProgress(cat);
-                const goal = (siteGoals.target_languages_hours as any)?.[cat] || 10;
+                const goal = (activeGoals.target_languages_hours as any)?.[cat] || 10;
                 return (
                   <div key={cat}>
                     <div className="mb-2 flex items-center justify-between">

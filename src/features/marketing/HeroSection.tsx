@@ -57,7 +57,7 @@ export function HeroSection() {
               <SectionJumpButton
                 className="px-8 border-border bg-background/50 backdrop-blur-sm h-14"
                 size="lg"
-                targetId="roadmap"
+                targetId="contribution-preview"
                 variant="outline"
               >
                 {t("hero.secondaryCta")}

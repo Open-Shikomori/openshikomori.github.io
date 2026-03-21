@@ -26,7 +26,7 @@ describe("i18n shell", () => {
 
     expect(
       await screen.findByRole("heading", {
-        name: /collecter et proteger les voix comoriennes avec une interface publique fiable/i,
+        name: /le comorien mérite une ia qui nous comprend/i,
       }),
     ).toBeInTheDocument();
 
@@ -52,7 +52,7 @@ describe("i18n shell", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: /اجمعوا الاصوات القمرية واحفظوها من خلال واجهة عامة موثوقة/i,
+        name: /اللغة القمرية تستحق ذكاء اصطناعيا يفهمنا/i,
       }),
     ).toBeInTheDocument();
   });
@@ -75,7 +75,7 @@ describe("i18n shell", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: /collect and safeguard comorian voices with a trustworthy public shell/i,
+        name: /comorian deserves ai that understands us/i,
       }),
     ).toBeInTheDocument();
   });

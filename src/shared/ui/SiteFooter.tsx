@@ -2,8 +2,6 @@ import { Github, Mail } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
-import { SectionJumpButton } from "@/shared/ui/SectionJumpButton";
-
 export function SiteFooter() {
   const { t } = useTranslation();
 
@@ -39,27 +37,24 @@ export function SiteFooter() {
                 <p className="text-xs font-bold uppercase tracking-widest text-foreground">
                   Project
                 </p>
-                <SectionJumpButton
-                  className="h-auto justify-start p-0 text-sm text-muted-foreground hover:text-primary"
-                  targetId="contribution-preview"
-                  variant="link"
+                <Link
+                  className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary"
+                  to="/about"
                 >
-                  Milestone
-                </SectionJumpButton>
-                <SectionJumpButton
-                  className="h-auto justify-start p-0 text-sm text-muted-foreground hover:text-primary"
-                  targetId="roadmap"
-                  variant="link"
+                  About
+                </Link>
+                <Link
+                  className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary"
+                  to="/dataset"
                 >
-                  Roadmap
-                </SectionJumpButton>
-                <SectionJumpButton
-                  className="h-auto justify-start p-0 text-sm text-muted-foreground hover:text-primary"
-                  targetId="privacy-consent"
-                  variant="link"
+                  Dataset
+                </Link>
+                <Link
+                  className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary"
+                  to="/roadmap"
                 >
-                  Privacy
-                </SectionJumpButton>
+                  {t("site.nav.roadmap")}
+                </Link>
               </div>
 
               <div className="flex flex-col gap-3 sm:gap-4">
@@ -68,7 +63,9 @@ export function SiteFooter() {
                 </p>
                 <a
                   className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary"
-                  href="https://github.com/Fanom2813"
+                  href="https://github.com/Open-Shikomori"
+                  rel="noopener noreferrer"
+                  target="_blank"
                 >
                   <Github className="size-4" /> GitHub
                 </a>

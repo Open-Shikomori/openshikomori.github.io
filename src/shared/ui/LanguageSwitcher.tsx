@@ -11,6 +11,7 @@ import { buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -45,14 +46,16 @@ export function LanguageSwitcher() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-56 border-border bg-background shadow-none">
-        <DropdownMenuLabel className="text-xs font-bold uppercase tracking-widest">{t("language.label")}</DropdownMenuLabel>
-        <DropdownMenuRadioGroup value={activeLanguage} onValueChange={handleLanguageChange}>
-          {supportedLanguages.map((language) => (
-            <DropdownMenuRadioItem key={language} value={language} className="text-xs font-bold uppercase tracking-widest">
-              {t(`language.${language}`)}
-            </DropdownMenuRadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="text-xs font-bold uppercase tracking-widest">{t("language.label")}</DropdownMenuLabel>
+          <DropdownMenuRadioGroup value={activeLanguage} onValueChange={handleLanguageChange}>
+            {supportedLanguages.map((language) => (
+              <DropdownMenuRadioItem key={language} value={language} className="text-xs font-bold uppercase tracking-widest">
+                {t(`language.${language}`)}
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );

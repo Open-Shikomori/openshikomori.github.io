@@ -13,5 +13,7 @@ export { AdminLoginPage } from './pages/AdminLoginPage';
 export { AdminDashboardPage } from './pages/AdminDashboardPage';
 export { AdminClipsPage } from './pages/AdminClipsPage';
 export { AdminCorrectionsPage } from './pages/AdminCorrectionsPage';
+export { AdminUsersPage } from './pages/AdminUsersPage';
 export { AdminContributorsPage } from './pages/AdminContributorsPage';
+export { AdminAdminsPage } from './pages/AdminAdminsPage';
 export { AdminSettingsPage } from './pages/AdminSettingsPage';
