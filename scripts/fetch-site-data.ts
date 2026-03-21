@@ -2,13 +2,38 @@ import { createClient } from '@supabase/supabase-js';
 import * as fs from 'fs';
 import * as path from 'path';
 
+function readEnv(name: string) {
+  const bunEnv = typeof Bun !== "undefined" ? Bun.env?.[name] : undefined;
+  return bunEnv ?? process.env[name];
+}
+
 // Supabase Connection
-// In GitHub Actions, it should use the VITE_SUPABASE_URL and a secure SUPABASE_SERVICE_ROLE_KEY (or anon key is fine for public RPCs)
-const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY || process.env.SUPABASE_ANON_KEY;
+// Read from both Bun.env and process.env so GitHub Actions + Bun stays reliable.
+const supabaseUrl = readEnv('VITE_SUPABASE_URL') || readEnv('SUPABASE_URL');
+const supabaseKey =
+  readEnv('SUPABASE_SERVICE_ROLE_KEY') ||
+  readEnv('VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY') ||
+  readEnv('VITE_SUPABASE_ANON_KEY') ||
+  readEnv('SUPABASE_ANON_KEY');
 
 if (!supabaseUrl || !supabaseKey) {
-  console.error("Missing Supabase credentials. Ensure VITE_SUPABASE_URL and a key are set.");
+  console.error(
+    "Missing Supabase credentials. Set VITE_SUPABASE_URL (or SUPABASE_URL) and one of SUPABASE_SERVICE_ROLE_KEY, VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY, VITE_SUPABASE_ANON_KEY, or SUPABASE_ANON_KEY.",
+  );
+  console.error(
+    JSON.stringify(
+      {
+        hasViteSupabaseUrl: Boolean(readEnv('VITE_SUPABASE_URL')),
+        hasSupabaseUrl: Boolean(readEnv('SUPABASE_URL')),
+        hasServiceRoleKey: Boolean(readEnv('SUPABASE_SERVICE_ROLE_KEY')),
+        hasPublishableDefaultKey: Boolean(readEnv('VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY')),
+        hasViteAnonKey: Boolean(readEnv('VITE_SUPABASE_ANON_KEY')),
+        hasSupabaseAnonKey: Boolean(readEnv('SUPABASE_ANON_KEY')),
+      },
+      null,
+      2,
+    ),
+  );
   process.exit(1);
 }
 

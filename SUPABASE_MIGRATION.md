@@ -17,7 +17,7 @@ VITE_FIREBASE_APP_ID=...
 **After (Supabase):**
 ```bash
 VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY=your-anon-key
 VITE_R2_WORKER_URL=https://your-worker.workers.dev
 ```
 
@@ -63,7 +63,7 @@ Supabase anonymous auth uses the `authenticated` role (not `anonymous` role). Th
 1. Go to **Project Settings > API**
 2. Copy:
    - `URL` → `VITE_SUPABASE_URL`
-   - `anon public` → `VITE_SUPABASE_ANON_KEY`
+   - `anon public` → `VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY`
 
 ### 5. Add Yourself as Admin
 
@@ -77,7 +77,7 @@ After first visiting the app (which creates your anonymous user):
 
 ```bash
 VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIs...
+VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY=eyJhbGciOiJIUzI1NiIs...
 VITE_R2_WORKER_URL=https://your-worker.workers.dev
 ```
 
